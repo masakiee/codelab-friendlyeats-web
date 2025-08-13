@@ -10,5 +10,20 @@ import { getAuth } from "firebase/auth";
 // Returns an authenticated client SDK instance for use in Server Side Rendering
 // and Static Site Generation
 export async function getAuthenticatedAppForUser() {
-  throw new Error("not implemented");
+  const authIdToken = (await cookies()).get("__session")?.value;
+
+  const firebaseServerApp = initializeServerApp(
+    initializeApp(),
+    {
+      authIdToken,
+    },
+  );
+
+  const auth = getAuth(firebaseServerApp);
+  await auth.authStateReady();
+
+  return {
+    firebaseServerApp,
+    currentUser: auth.currentUser,
+  };
 }
