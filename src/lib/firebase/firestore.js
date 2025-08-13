@@ -42,11 +42,33 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
 }
 
 function applyQueryFilters(q, { category, city, price, sort }) {
-  return;
+  if (category) {
+    q = query(q, where("category", "==", category));
+  }
+  if (city) {
+    q = query(q, where("city", "==", city));
+  }
+  if (price) {
+    q = query(q, where("price", "==", price));
+  }
+  if (sort) {
+    q = query(q, orderBy("timestamp", sort));
+  }
+  return q;
 }
 
 export async function getRestaurants(db = db, filters = {}) {
-  return [];
+  let q = query(collection(db, "restaurants"));
+
+  q = applyQueryFilters(q, filters);
+  const results = await getDocs(q);
+  return results.docs.map((doc) => {
+    return {
+      id: doc.id,
+      ...doc.data(),
+      timestamp: doc.data().timestamp.toDate(),
+    };
+  });
 }
 
 export function getRestaurantsSnapshot(cb, filters = {}) {
