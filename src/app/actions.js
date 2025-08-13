@@ -11,9 +11,14 @@ export async function handleReviewFormSubmission(data) {
     const { app } = await getAuthenticatedAppForUser();
     const db = getFirestore(app);
 
-    await addReviewToRestaurant(db, data.get("restaurantId"), {
-        text: data.get("text"),
-        rating: data.get("rating"),
-        userId: data.get("userId"),
-    });
+    try {
+        await addReviewToRestaurant(db, data.get("restaurantId"), {
+            text: data.get("text"),
+            rating: data.get("rating"),
+            userId: data.get("userId"),
+        });
+    } catch (e) {
+        console.error("There was an error adding the review to the restaurant", e);
+        throw e;
+    }
 }

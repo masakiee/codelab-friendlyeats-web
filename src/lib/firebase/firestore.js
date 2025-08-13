@@ -64,9 +64,9 @@ export async function addReviewToRestaurant(db, restaurantId, review) {
     const newRatingDocument = doc(
       collection(db, `restaurants/${restaurantId}/ratings`),
     );
-    await runTransaction(db, async (transaction) => {
-      updateWithRating(transaction, docRef, newRatingDocument, review);
-    });
+    await runTransaction(db, (transaction) =>
+      updateWithRating(transaction, docRef, newRatingDocument, review)
+    );
   } catch (e) {
     console.error("There was an error adding the rating to the restaurant", e);
     throw e;
