@@ -24,6 +24,8 @@ function useUserSession(initialUser) {
       window.location.reload();
     });
   }, [initialUser]);
+
+  return initialUser;
 }
 
 export default function Header({ initialUser }) {
