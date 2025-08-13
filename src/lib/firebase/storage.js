@@ -5,7 +5,27 @@ import { storage } from "@/src/lib/firebase/clientApp";
 import { updateRestaurantImageReference } from "@/src/lib/firebase/firestore";
 
 // Replace the two functions below
-export async function updateRestaurantImage(restaurantId, image) {}
+export async function updateRestaurantImage(restaurantId, image) {
+    try {
+        if (!restaurantId) {
+            throw new Error("No restaurant ID has been provided");
+        }
+        if (!image || !image.name) {
+            throw new Error("A valid image has not been provided")
+        }
+        const publicImageUrl = await uploadImage(restaurantId, image);
+        await updateRestaurantImageReference(restaurantId, publicImageUrl);
 
-async function uploadImage(restaurantId, image) {}
-// Replace the two functions above
+        return publicImageUrl;
+    } catch (e) {
+        console.error("There was an error updating the restaurant image", e);
+    }
+}
+
+async function uploadImage(restaurantId, image) {
+    const filePath = `images/${restaurantId}/${image.name}`;
+    const newImageRef = ref(storage, filePath);
+    await uploadBytesResumable(newImageRef, image);
+
+    return await getDownloadURL(newImageRef);
+}
